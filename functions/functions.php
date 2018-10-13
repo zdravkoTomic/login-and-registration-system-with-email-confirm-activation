@@ -237,6 +237,7 @@ function validateUserLogin()
 
         $email              = clean($_POST['email']);
         $password           = clean($_POST['password']);
+        $remember           = isset($_POST['remember']) ? $_POST['remember'] : null;
 
         if(empty($email)) {
             $errors[] = 'Email field cannot be empty';
@@ -250,7 +251,7 @@ function validateUserLogin()
                 echo validationErrors($error);
             }
         } else {
-            if(loginUser($email, $password)) {
+            if(loginUser($email, $password, $remember)) {
                 redirect("admin.php");
             } else {
                 echo validationErrors("Your cedentials are not correct");
@@ -262,12 +263,12 @@ function validateUserLogin()
 
 /**************************  USER LOGIN FUNCTIONS */
 
-function loginUser($email, $password)
+function loginUser($email, $password, $remember)
 {
     $sql = "SELECT password, id 
             FROM users
             WHERE email = '".escape($email)."'
-             AND active = 1";
+            AND active = 1";
 
     $result = query($sql);
 
@@ -278,6 +279,10 @@ function loginUser($email, $password)
         $dbPassword = $row['password'];
 
         if(md5($password) == $dbPassword) {
+
+            if($remember == "on") {
+                setcookie('email', $email, time() + 86400);
+            }
 
             $_SESSION['email'] = $email;
 
@@ -298,7 +303,7 @@ function loginUser($email, $password)
 
 function logged_in()
 {
-    if(isset($_SESSION['email'])) {
+    if(isset($_SESSION['email']) || isset($_COOKIE['email'])) {
         return true;
     } else {
         return false;
