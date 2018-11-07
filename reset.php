@@ -1,14 +1,17 @@
 <?php include("includes/header.tpl.php"); ?>
 
-	<div class="row">
-
-	</div>
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            <?php  displayMessage(); ?>
+            <?php passwordReset(); ?>
+        </div>
+    </div>
     	<div class="row">
 			<div class="col-md-6 col-md-offset-3">
 				<div class="panel panel-login">
 					<div class="panel-heading">
 						<div class="row">
-						
+
 							<div class="col-xs-12">
 								<h3>Reset Password</h3>
 							</div>
@@ -33,11 +36,11 @@
 											</div>
 										</div>
 									</div>
+                                    <input type="hidden" class="hide" name="token" id="token" value="<?= tokenGenerator() ?>">
 								</form>
 							</div>
 						</div>
 					</div>
-				</div>
 			</div>
 		</div>
 
