@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PhpProjectServersManager">
+    <servers>
+      <server host="127.0.0.1" id="9e8628b0-10b9-4380-b3cd-d2669497511b" name="Unnamed" port="81" />
+      <server deployment_server="8268e089-286f-490f-b3f7-c5d0a7e6000a" host="localhost" id="a2d1ef69-8d52-4179-998d-063bbd06ad27" name="Login" port="81" />
+    </servers>
+  </component>
+  <component name="PhpProjectSharedConfiguration" php_language_level="7.1" />
+</project>
