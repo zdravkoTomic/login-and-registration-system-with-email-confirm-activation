@@ -309,3 +309,82 @@ function logged_in()
         return false;
     }
 }
+
+/*********************** RECOVER PASSWORD *********************/
+
+function recover_password()
+{
+    if($_SERVER['REQUEST_METHOD'] == "POST") {
+        if(isset($_SESSION['token']) && $_POST['token'] == $_SESSION['token']) {
+
+            $email = clean($_POST['email']);
+
+            if(emailExist($email)) {
+
+                $validationCode = md5($email);
+
+                setcookie('temp_access_code', $validationCode, time()+ 86400);
+
+                $sql = "UPDATE users SET validation_code = '".escape($validationCode)."' WHERE email = '".$email."' ";
+                $result = query($sql);
+                confirm($result);
+
+                $subject = "Please reset your password";
+                $message = " here is your password reset code: {$validationCode}
+                
+                Click here to reset your password http://localhost/code.php?email=$email&code=$validationCode
+            
+                ";
+
+                $headers = "From: noreply@yourwebsite.com";
+                if(!sendEmail($email, $subject, $message, $headers)) {
+                    echo validationErrors("email can now be sent");
+                }
+
+                setMessage("<p class='bg-success'>Please check your email or spam folder for a passwword reset code</p>");
+                redirect("index.php");
+            } else {
+                echo validationErrors("this email does not exists");
+            }
+        } else {
+            redirect('index.php');
+        }
+
+    }
+}
+
+/************************ CODE VALIDATION  ***********************/
+
+function validationCode()
+{
+    if(isset($_COOKIE['temp_access_code'])) {
+
+            if(!isset($_GET['email']) && !isset($_GET['code'])) {
+                redirect("index.php");
+
+            } else if(empty($_GET['email']) || empty($_GET['code'])){
+                redirect("index.php");
+            } else {
+                if(isset($_POST['code'])){
+                    $email = clean($_GET['email']);
+                    $validationCode = clean($_POST['code']);
+
+                    $sql = "SELECT id FROM users WHERE validation_code = '$validationCode' AND email = '$email'";
+                    $result = query($sql);
+
+                    confirm($result);
+
+                    if(rowCount($result) == 1){
+                        redirect("reset.php");
+                    } else {
+                        echo validationErrors("Sorry, wrong validation code");
+                    }
+                }
+            }
+
+
+    } else {
+        setMessage("<p class='bg-danger'>Sorry, your validation cokie has expired</p>");
+        redirect("recover.php");
+    }
+}
