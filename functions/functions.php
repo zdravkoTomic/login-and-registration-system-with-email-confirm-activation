@@ -323,7 +323,7 @@ function recover_password()
 
                 $validationCode = md5($email);
 
-                setcookie('temp_access_code', $validationCode, time()+ 86400);
+                setcookie('temp_access_code', $validationCode, time()+ 22200);
 
                 $sql = "UPDATE users SET validation_code = '".escape($validationCode)."' WHERE email = '".$email."' ";
                 $result = query($sql);
@@ -348,6 +348,10 @@ function recover_password()
             }
         } else {
             redirect('index.php');
+        }
+
+        if(isset($_POST['cancel_submit'])){
+            redirect("login.php");
         }
 
     }
@@ -375,7 +379,8 @@ function validationCode()
                     confirm($result);
 
                     if(rowCount($result) == 1){
-                        redirect("reset.php");
+                        setcookie('temp_access_code', $validationCode, time()+ 11100);
+                        redirect("reset.php?email=$email&code=$validationCode");
                     } else {
                         echo validationErrors("Sorry, wrong validation code");
                     }
@@ -385,6 +390,40 @@ function validationCode()
 
     } else {
         setMessage("<p class='bg-danger'>Sorry, your validation cokie has expired</p>");
+        redirect("recover.php");
+    }
+}
+
+/************************ PASSWORD RESET FUNCTION ***********************/
+
+function passwordReset()
+{
+    if (isset($_COOKIE['temp_access_code'])) {
+        if (isset($_GET['email']) && isset($_GET['code'])) {
+
+            if (isset($_SESSION['token']) && isset($_POST['token']))  {
+
+                if($_POST['token'] == $_SESSION['token']){
+
+                    if($_POST['password'] === $_POST['confirm_password']) {
+
+                        $updatedPassword = md5($_POST['password']);
+
+                        $sql = "UPDATE users SET password = '". escape($updatedPassword) ."', validation_code = 0 WHERE email = '". escape($_GET['email']) ."' ";
+                        $result = query($sql);
+                        confirm($result);
+
+                        setMessage("<p class='bg-success'>Your password has been updated, please login</p>");
+
+                        redirect("login.php");
+
+                    }
+
+                }
+            }
+        }
+    } else {
+        setMessage("<p class='bg-danger'>Sorry your time has expired</p>");
         redirect("recover.php");
     }
 }

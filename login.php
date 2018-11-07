@@ -1,8 +1,17 @@
 <?php include("includes/header.tpl.php"); ?>
+
+<?php
+
+    if(logged_in()) {
+        redirect("admin.php");
+    }
+
+?>
 <?php include("includes/nav.tpl.php"); ?>
 
 	<div class="row">
 		<div class="col-lg-6 col-lg-offset-3">
+            <?php  displayMessage() ?>
             <?php  validateUserLogin(); ?>
 		</div>
 	</div>
